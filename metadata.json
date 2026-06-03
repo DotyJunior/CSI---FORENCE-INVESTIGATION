@@ -1,0 +1,6 @@
+{
+  "name": "CSI: Crime Scene Online",
+  "description": "Uma experiência interativa de investigação criminal em tempo real com minijogos de laboratório, caça-objetos e mecânicas de detetive forense.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
