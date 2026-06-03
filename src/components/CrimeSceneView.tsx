@@ -54,59 +54,16 @@ export default function CrimeSceneView({
   
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Web Audio Synth Engine
   const playShutterSound = () => {
     if (!soundEnabled) return;
     try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
-      const ctx = new AudioContext();
-      
-      // 1. Shutter noise burst
-      const bufferSize = ctx.sampleRate * 0.12; // short 120ms
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-      
-      const noiseNode = ctx.createBufferSource();
-      noiseNode.buffer = buffer;
-      
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1500, ctx.currentTime);
-      filter.frequency.exponentialRampToValueAtTime(7000, ctx.currentTime + 0.1);
-      
-      const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.4, ctx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.11);
-      
-      noiseNode.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
-      
-      // 2. High-pitch auto-focus beep confirmation
-      const osc = ctx.createOscillator();
-      const oscGain = ctx.createGain();
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(2400, ctx.currentTime);
-      osc.frequency.setValueAtTime(3200, ctx.currentTime + 0.03);
-      
-      oscGain.gain.setValueAtTime(0.15, ctx.currentTime);
-      oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.09);
-      
-      osc.connect(oscGain);
-      oscGain.connect(ctx.destination);
-      
-      noiseNode.start();
-      osc.start();
-      
-      noiseNode.stop(ctx.currentTime + 0.12);
-      osc.stop(ctx.currentTime + 0.12);
+      const audio = new Audio('/audio-camera-dslr.mp3');
+      audio.volume = 0.95;
+      audio.play().catch((err) => {
+        console.warn("Falha ao reproduzir áudio real DSLR de /audio-camera-dslr.mp3:", err);
+      });
     } catch (e) {
-      console.warn("Audio Context block:", e);
+      console.warn("Falha ao instanciar objeto de áudio:", e);
     }
   };
 
@@ -236,9 +193,6 @@ export default function CrimeSceneView({
       addLog(`✨ [FOTO_REGISTRO] Captura espectral realizada com sucesso!`);
       addLog(`✅ EVIDÊNCIA COLETADA: ${foundHotspot.clueTitle.toUpperCase()}`);
       
-      // Play high-key success beep
-      setTimeout(playSuccessSound, 150);
-
       // Trigger "EVIDÊNCIA REGISTRADA" HUD banner alert
       setToastEvidence({
         title: foundHotspot.clueTitle,
