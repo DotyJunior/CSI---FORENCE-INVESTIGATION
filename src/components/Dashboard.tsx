@@ -227,6 +227,125 @@ export default function Dashboard({
   const activePartner = partners.find(p => p.id === (profile.activePartnerId || 'p-sarah')) || partners[0];
   const activeAgency = DEFAULT_AGENCIES.find(a => a.id === currentAgencyId) || DEFAULT_AGENCIES[0];
 
+  const getCaseOperationalStatus = (csId: string, isUnlocked: boolean, isCompleted: boolean) => {
+    if (isCompleted) {
+      return {
+        label: 'RESOLVIDO',
+        colorClass: 'bg-emerald-950/80 border-emerald-555 border-emerald-500/30 text-emerald-400',
+        dotColor: 'bg-emerald-400',
+        badge: '🟢 RESOLVIDO',
+        extraStats: (
+          <div className="mt-2.5 pt-2.5 border-t border-slate-900 grid grid-cols-2 gap-2 text-[10px] font-mono uppercase text-slate-400">
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Resultado</span>
+              <span className="font-bold text-emerald-400 truncate block">Culpado Identificado</span>
+            </div>
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Taxa de Certeza</span>
+              <span className="font-bold text-slate-200 block">{profile.accuracyRate || 98}% Taxa</span>
+            </div>
+          </div>
+        )
+      };
+    }
+    
+    if (!isUnlocked) {
+      return {
+        label: 'CUSTÓDIA BLOQUEADA',
+        colorClass: 'bg-slate-950/40 border-slate-900/60 text-slate-500',
+        dotColor: 'bg-slate-700',
+        badge: '⚫ ARQUIVADO / BLOQUEADO',
+        extraStats: (
+          <div className="mt-2.5 pt-2.5 border-t border-slate-900 text-[9px] font-mono text-slate-500 uppercase tracking-widest">
+            🔒 Protocolos pendentes ou credencial insuficiente.
+          </div>
+        )
+      };
+    }
+
+    if (csId === '001') {
+      return {
+        label: 'EQUIPE NO LOCAL',
+        colorClass: 'bg-blue-950/80 border-blue-500/30 text-blue-400',
+        dotColor: 'bg-blue-400',
+        badge: '🔵 EQUIPE NO LOCAL',
+        extraStats: (
+          <div className="mt-2.5 pt-2.5 border-t border-slate-900/60 grid grid-cols-2 gap-2 text-[10px] font-mono uppercase text-slate-400">
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Coleta de Pistas</span>
+              <span className="font-bold text-slate-200 block">7 / 15 Evidências</span>
+            </div>
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Progresso Real</span>
+              <span className="font-bold text-blue-400 block">45% Concluído</span>
+            </div>
+          </div>
+        )
+      };
+    }
+
+    if (csId === '002') {
+      return {
+        label: 'INVESTIGANDO',
+        colorClass: 'bg-amber-950/80 border-amber-500/30 text-amber-400',
+        dotColor: 'bg-amber-400',
+        badge: '🟠 INVESTIGANDO',
+        extraStats: (
+          <div className="mt-2.5 pt-2.5 border-t border-slate-900 grid grid-cols-2 gap-2 text-[10px] font-mono uppercase text-slate-400">
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Responsável Base</span>
+              <span className="font-bold text-slate-200 block truncate">{profile.name}</span>
+            </div>
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Atualização Recente</span>
+              <span className="font-bold text-amber-400 block">Há 2 horas</span>
+            </div>
+          </div>
+        )
+      };
+    }
+
+    if (csId === '003') {
+      return {
+        label: 'ANÁLISE FORENSE',
+        colorClass: 'bg-purple-950/80 border-purple-500/30 text-purple-400',
+        dotColor: 'bg-purple-400',
+        badge: '🟣 ANÁLISE FORENSE',
+        extraStats: (
+          <div className="mt-2.5 pt-2.5 border-t border-slate-900 grid grid-cols-2 gap-2 text-[10px] font-mono uppercase text-slate-400">
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Laboratório</span>
+              <span className="font-bold text-purple-400 block">Análise DNA Biológica</span>
+            </div>
+            <div>
+              <span className="text-slate-500 text-[8px] tracking-wider block">Situação Atual</span>
+              <span className="font-bold text-slate-300 block">Triagem de Material</span>
+            </div>
+          </div>
+        )
+      };
+    }
+
+    return {
+      label: 'INVESTIGANDO',
+      colorClass: 'bg-amber-950/80 border-amber-500/30 text-amber-400',
+      dotColor: 'bg-amber-400',
+      badge: '🟠 INVESTIGANDO',
+      extraStats: (
+        <div className="mt-2.5 pt-2.5 border-t border-slate-900 grid grid-cols-2 gap-2 text-[10px] font-mono uppercase text-slate-400">
+          <div>
+            <span className="text-slate-500 text-[8px] tracking-wider block">Encarregado</span>
+            <span className="font-bold text-slate-200 block truncate">{profile.name}</span>
+          </div>
+          <div>
+            <span className="text-slate-500 text-[8px] tracking-wider block">Atualização Recente</span>
+            <span className="font-bold text-amber-400 block">Aguardando Coleta</span>
+          </div>
+        </div>
+      )
+    };
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 font-mono text-slate-100 p-3 md:p-6 relative overflow-x-hidden" id="dashboard-root">
       
@@ -540,34 +659,71 @@ export default function Dashboard({
                   className="space-y-6"
                 >
                   
-                  {/* EMERGENY NOTIFICATION HEADER WIDGET (ALERTA DE NOVA OCORRÊNCIA DETECTADA) */}
-                  <div className="bg-slate-900/40 border-2 border-red-500/40 rounded-2xl p-5 relative overflow-hidden backdrop-blur" id="new-crime-broadcast">
+                  {/* SEÇÃO ESPECIAL: ALERTA AGORA (Ocorrência Recém-Recebida) */}
+                  <div className="bg-slate-900/90 border-2 border-red-500 rounded-2xl p-5 relative overflow-hidden shadow-[0_0_25px_rgba(239,68,68,0.15)] backdrop-blur animate-pulse" id="alerta-agora-broadcast">
                     
-                    {/* Pulsing hazard warning stripes on side */}
+                    {/* Pulsing hazard stripe on the left side */}
                     <div className="absolute top-0 bottom-0 left-0 w-2.5" 
                          style={{ backgroundImage: 'repeating-linear-gradient(0deg, #ef4444, #ef4444 10px, #0f172a 10px, #0f172a 20px)' }} />
                     
-                    <div className="pl-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <AlertTriangle className="w-5 h-5 text-red-500 animate-bounce" />
-                          <span className="text-xs font-bold text-red-400 uppercase tracking-widest font-mono">
-                            NOVA OCORRÊNCIA DETECTADA NO SENSOR DE INCIDENTES
+                    <div className="pl-6 space-y-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-red-500/20 pb-3">
+                        <div className="flex items-center gap-2.5">
+                          <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-duration-1000"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                          </span>
+                          <span className="text-xs font-black text-red-500 uppercase tracking-widest font-mono">
+                            🔴 ALERTA AGORA // NOVA OCORRÊNCIA DETECTADA
                           </span>
                         </div>
-                        <p className="text-[11px] leading-relaxed text-slate-300">
-                          Central Forense reporta corpo não identificado encontrado em perímetro industrial suspeito. Assuma a perícia para colher evidências.
-                        </p>
+                        <div className="flex items-center gap-1.5 bg-red-950/40 border border-red-500/30 px-2 py-0.5 rounded text-[10px] font-bold text-red-400 uppercase tracking-widest font-mono">
+                          EQUIPE NECESSÁRIA
+                        </div>
                       </div>
 
-                      <div className="flex gap-4 text-left text-[9px] font-mono border-l border-slate-800 pl-4">
-                        <div>
-                          <p className="text-slate-500 uppercase">Localização</p>
-                          <p className="text-slate-200 font-bold uppercase">Distrito Industrial, Miami</p>
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-left font-mono">
+                        <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                          <p className="text-[10px] text-slate-500 uppercase font-black">Caso ID</p>
+                          <p className="text-xs font-black text-slate-205 text-slate-200 mt-0.5">CASO #2487 (COD-001)</p>
                         </div>
-                        <div>
-                          <p className="text-slate-500 uppercase">Prioridade</p>
-                          <p className="text-pink-400 font-bold uppercase">Urgente (Código 3)</p>
+                        <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                          <p className="text-[10px] text-slate-500 uppercase font-black">Localização</p>
+                          <p className="text-xs font-black text-slate-202 text-slate-200 mt-0.5">Distrito Industrial</p>
+                        </div>
+                        <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                          <p className="text-[10px] text-slate-500 uppercase font-black">Horário Captura</p>
+                          <p className="text-xs font-black text-slate-202 text-slate-200 mt-0.5">23:47 LOCAL</p>
+                        </div>
+                        <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                          <p className="text-[10px] text-slate-500 uppercase font-black">Prioridade Operação</p>
+                          <p className="text-xs font-black text-red-400 mt-0.5 tracking-wider uppercase">ALTA</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 md:flex md:items-center md:justify-between md:gap-5">
+                        <div className="space-y-1.5 flex-1">
+                          <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest font-mono">DESCRIÇÃO DA OCORRÊNCIA</p>
+                          <p className="text-xs text-slate-300 leading-relaxed font-sans font-medium">
+                            Um vigilante relatou atividade suspeita em um laboratório químico abandonado. Uma equipe forense foi solicitada estruturalmente.
+                          </p>
+                        </div>
+                        
+                        <div className="shrink-0 mt-3 md:mt-0">
+                          {completedCases.includes('001') ? (
+                            <div className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-950/80 border border-emerald-800 text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded-xl">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              <span>Missão Concluída</span>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => onSelectCase('001')}
+                              className="w-full md:w-auto bg-red-650 hover:bg-red-500 bg-red-600 text-slate-950 hover:scale-102 font-black py-2.5 px-5 rounded-xl text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 transition duration-200 cursor-pointer shadow-md shadow-red-500/10"
+                            >
+                              <Activity className="w-3.5 h-3.5" />
+                              <span>Aceitar Missão</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -596,6 +752,7 @@ export default function Dashboard({
                       {cases.map((cs, index) => {
                         const isCompleted = completedCases.includes(cs.id);
                         const isUnlocked = index === 0 || completedCases.includes(cases[index - 1].id);
+                        const opStatus = getCaseOperationalStatus(cs.id, isUnlocked, isCompleted);
 
                         return (
                           <div
@@ -609,6 +766,12 @@ export default function Dashboard({
                             }`}
                             id={`case-card-${cs.id}`}
                           >
+                            {/* Operational Status Header Banner */}
+                            <div className={`px-4 py-2 border-b text-[9px] font-bold uppercase tracking-wider flex items-center gap-2 ${opStatus.colorClass}`}>
+                              <span className={`w-2 h-2 rounded-full ${opStatus.dotColor} ${!isCompleted && isUnlocked && 'animate-ping'}`} />
+                              <span>{opStatus.badge}</span>
+                            </div>
+
                             {/* Cinematic Case Image */}
                             <div className="relative h-44 overflow-hidden bg-slate-900">
                               <img 
@@ -654,9 +817,12 @@ export default function Dashboard({
                                 <p className="text-[11px] text-slate-400 leading-relaxed mt-2 line-clamp-3 font-sans font-medium">
                                   {cs.description}
                                 </p>
+
+                                {/* Dynamic CSI Operation Stats */}
+                                {opStatus.extraStats}
                               </div>
 
-                              <div className="mt-4 pt-3 border-t border-slate-900 flex items-center justify-between">
+                              <div className="mt-4 pt-3 border-t border-slate-950 flex items-center justify-between">
                                 {/* Rewards badge */}
                                 <div className="flex gap-3 text-[10px] font-mono font-bold">
                                   <span className="text-cyan-400 bg-cyan-950/40 border border-cyan-900/30 px-1.5 py-0.5 rounded">+{cs.rewardXp} XP</span>
@@ -690,6 +856,154 @@ export default function Dashboard({
                         );
                       })}
                     </div>
+
+                    {/* --OS OUTROS CASOS (DIVISÃO DE SUPORTE OPERACIONAL MULTI-CO-LATERAIS DA CIDADE) */}
+                    <div className="mt-8 pt-6 border-t border-slate-800" id="other-precinct-cases">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                        <div className="space-y-0.5">
+                          <h4 className="text-xs font-bold text-slate-350 text-slate-300 tracking-wider uppercase font-mono flex items-center gap-2">
+                            <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
+                            <span>MONITORAMENTO DE SESSÕES CO-LATERAIS EM ANDAMENTO (OUTROS CASOS)</span>
+                          </h4>
+                          <p className="text-[9px] text-slate-500">
+                            Canais de patrulha e investigação forense ativos em outras divisões civis sob jurisdição federal.
+                          </p>
+                        </div>
+                        <span className="text-[8px] bg-slate-950 text-slate-500 border border-slate-800 px-2.5 py-1 rounded font-bold uppercase shrink-0 tracking-wider">
+                          Feed Integrado Ativo
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4" id="other-cases-grid">
+                        
+                        {/* Case #2481: Investigando */}
+                        <div className="bg-slate-950/40 border border-amber-900/30 hover:border-amber-500/30 rounded-xl p-3.5 transition duration-150 relative overflow-hidden flex flex-col justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] bg-amber-950 border border-amber-900/50 text-amber-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                🟠 Investigando
+                              </span>
+                              <span className="text-[8px] font-mono text-slate-600 font-bold">#2481</span>
+                            </div>
+                            <h5 className="text-[11px] font-black tracking-normal text-slate-200 uppercase truncate">
+                              Disparo Noturno
+                            </h5>
+                          </div>
+                          <div className="mt-3.5 border-t border-slate-900/60 pt-2 text-[9px] font-mono text-slate-400 space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Perito:</span>
+                              <span className="text-slate-300 font-bold">PERITO_685</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Atualiz.:</span>
+                              <span className="text-amber-400 font-bold">Há 2 horas</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Case #2478: Equipe no Local */}
+                        <div className="bg-slate-950/40 border border-blue-900/30 hover:border-blue-500/30 rounded-xl p-3.5 transition duration-150 relative overflow-hidden flex flex-col justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] bg-blue-950 border border-blue-900/50 text-blue-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                🔵 Equipe no Local
+                              </span>
+                              <span className="text-[8px] font-mono text-slate-600 font-bold">#2478</span>
+                            </div>
+                            <h5 className="text-[11px] font-black tracking-normal text-slate-200 uppercase truncate">
+                              Armazém Sob Fogo
+                            </h5>
+                          </div>
+                          <div className="mt-3.5 border-t border-slate-900/60 pt-2 text-[9px] font-mono text-slate-400 space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Pistas:</span>
+                              <span className="text-slate-300 font-bold">7 / 15</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Progresso:</span>
+                              <span className="text-blue-400 font-bold">45%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Case #2475: Análise Forense */}
+                        <div className="bg-slate-950/40 border border-purple-900/30 hover:border-purple-500/30 rounded-xl p-3.5 transition duration-150 relative overflow-hidden flex flex-col justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] bg-purple-950 border border-purple-900/50 text-purple-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                🟣 Análise Forense
+                              </span>
+                              <span className="text-[8px] font-mono text-slate-600 font-bold">#2475</span>
+                            </div>
+                            <h5 className="text-[11px] font-black tracking-normal text-slate-200 uppercase truncate">
+                              Químico Suspeito
+                            </h5>
+                          </div>
+                          <div className="mt-3.5 border-t border-slate-900/60 pt-2 text-[9px] font-mono text-slate-400 space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Lab:</span>
+                              <span className="text-purple-400 font-bold font-mono">DNA</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Situação:</span>
+                              <span className="text-slate-300 font-bold truncate">Aguardando resultado</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Case #2469: Resolvido */}
+                        <div className="bg-slate-950/40 border border-emerald-900/30 hover:border-emerald-500/30 rounded-xl p-3.5 transition duration-150 relative overflow-hidden flex flex-col justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] bg-emerald-950 border border-emerald-900/50 text-emerald-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                🟢 Resolvido
+                              </span>
+                              <span className="text-[8px] font-mono text-slate-600 font-bold">#2469</span>
+                            </div>
+                            <h5 className="text-[11px] font-black tracking-normal text-slate-200 uppercase truncate">
+                              Corretora Cripto
+                            </h5>
+                          </div>
+                          <div className="mt-3.5 border-t border-slate-900/60 pt-2 text-[9px] font-mono text-slate-400 space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Resultado:</span>
+                              <span className="text-emerald-400 font-bold">Culpado ID</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Certeza:</span>
+                              <span className="text-slate-300 font-bold">98%</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Case #2451: Arquivado */}
+                        <div className="bg-slate-950/40 border border-slate-900 hover:border-slate-800 rounded-xl p-3.5 transition duration-150 relative overflow-hidden flex flex-col justify-between">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] bg-slate-900 border border-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                ⚫ Arquivado
+                              </span>
+                              <span className="text-[8px] font-mono text-slate-600 font-bold">#2451</span>
+                            </div>
+                            <h5 className="text-[11px] font-black tracking-normal text-slate-200 uppercase truncate">
+                              Álibi Deletado
+                            </h5>
+                          </div>
+                          <div className="mt-3.5 border-t border-slate-900/60 pt-2 text-[9px] font-mono text-slate-400 space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Solução:</span>
+                              <span className="text-slate-400 font-bold font-mono">Arquivado</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500 uppercase text-[8px]">Motivo:</span>
+                              <span className="text-red-400 font-bold">Insuficiente</span>
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
                   </div>
 
                   {/* HIGH-GRADE INTELLIGENCE LEADERBOARD */}

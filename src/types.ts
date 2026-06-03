@@ -1,4 +1,18 @@
-export type Specialization = 'Balístico' | 'Digital' | 'DNA' | 'Criminal Geral' | 'Investigador de Campo';
+export type Specialization = 
+  | 'Balístico' 
+  | 'Digital' 
+  | 'DNA' 
+  | 'Criminal Geral' 
+  | 'Investigador de Campo'
+  // Futuras especializações estruturadas para expansão:
+  | 'Perícia Criminal Avançada'
+  | 'Balística Aplicada'
+  | 'Sequenciamento de DNA'
+  | 'Investigação de Crimes Digitais'
+  | 'Divisão de Homicídios'
+  | 'Divisão de Narcóticos'
+  | 'Esquadrão Antibombas'
+  | 'Investigação de Crimes Financeiros';
 
 export type CareerTier = 
   | 'Estagiário'
